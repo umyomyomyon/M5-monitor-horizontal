@@ -3,6 +3,8 @@
 
 #define TARGET_ANGLE 1
 #define ANGLE_THRESHOLD 3
+#define DELAY 20
+#define RC_FILTER_COEFFICIENT 0.9
 
 float accx = 0.0F;
 float accy = 0.0F;
@@ -48,8 +50,20 @@ void drawAngleDiff(float accx, float accy) {
   M5.Lcd.printf("angle: %4.2f\n", angle);
 }
 
+float RCFilter(float coefficient, float* exValue, float value) {
+  float filteredValue = coefficient * (*exValue) + (1 - coefficient) * value;
+  *exValue = filteredValue;
+  return filteredValue;
+}
+
 void loop() {
+  static float exAccX = 0;
+  static float exAccY = 0;
+
   M5.IMU.getAccelData(&accx, &accy, &accz);
-  drawAngleDiff(accx, accy);
-  delay(20);
+  float filteredAccX = RCFilter(RC_FILTER_COEFFICIENT, &exAccX, accx);
+  float filteredAccY = RCFilter(RC_FILTER_COEFFICIENT, &exAccY, accy);
+  drawAngleDiff(filteredAccX, filteredAccY);
+
+  delay(DELAY);
 }
