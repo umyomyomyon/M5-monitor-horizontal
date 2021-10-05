@@ -1,9 +1,9 @@
 # 参考
 
-## M5stackCのセンサー周り
+## M5stickCのセンサー周り
 [M5StickCで振動を測定する - AmbientでIoTをはじめよう](https://pages.switch-science.com/letsiot/vibration/)
 
-## M5stackのLCD周り 
+## LCD周り 
 [LCD 画面表示](https://github.com/m5stack/m5-docs/blob/master/docs/ja/api/lcd.md)  
 
 [【Arduino】M5StickCの画面制御を極める！画面表示のすすめ](https://karakuri-musha.com/inside-technology/arduino-m5stickc-04-time-display-for-m5stickc/)
