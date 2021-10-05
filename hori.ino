@@ -1,50 +1,55 @@
 #include <M5StickC.h>
 #include <math.h>
 
-#define SAMPLE_SIZE 160
-float data[SAMPLE_SIZE];
-int count = 0;
-int idx = 0;
+#define TARGET_ANGLE 1
+#define ANGLE_THRESHOLD 3
 
 float accx = 0.0F;
 float accy = 0.0F;
 float accz = 0.0F;
 
 void drawBaseLine() {
-  M5.Lcd.drawLine(0, 40, 160, 40, WHITE);
-  M5.Lcd.drawLine(80, 0, 80, 80, WHITE);
+  int16_t width = M5.Lcd.width();
+  int16_t height = M5.Lcd.height();
+  M5.Lcd.drawFastVLine(width / 2, 0, height, WHITE);
+  M5.Lcd.drawFastHLine(0, height / 2, width, WHITE);
 }
 
 void setup() {
   M5.begin();
   M5.IMU.Init();
+  M5.Lcd.begin();
   M5.Lcd.setRotation(3);
   drawBaseLine();
 }
 
-float culcValue(float value, int16_t offset, float div) {
-  return offset - value / div;
+int chooseColor(uint angle) {
+  if (angle > ANGLE_THRESHOLD) {
+    return RED;
+  }
+  if (angle <= TARGET_ANGLE) {
+    return BLUE;
+  }
+  return GREEN;
 }
 
-void drawGraph(float data[]) {
+void drawAngleDiff(float accx, float accy) {
   M5.Lcd.fillScreen(BLACK);
   drawBaseLine();
-  int16_t height = M5.Lcd.height();
-  int16_t offset = height / 2;
-  for (int i = 0; i < SAMPLE_SIZE; i++) {
-    float y = culcValue(data[i], offset, 0.03);
-    if (i != 0 && i != SAMPLE_SIZE - 1) {
-      float _y = culcValue(data[i-1], offset, 0.03);
-      M5.Lcd.drawLine(i - 1, _y, i, y, GREEN);
-    }
-  }
+
+  int offset = M5.Lcd.height() / 2;
+  float radianAngle = atan(accy / accx) * (-1);
+  int y = round(M5.Lcd.width() / 2 * tan(radianAngle));
+  float angle = radianAngle * 180 / PI;
+  int color = chooseColor(abs(angle));
+
+  M5.Lcd.drawLine(0, offset - y * (-1), M5.Lcd.width(), offset - y, color);
+  M5.Lcd.setCursor(0, 0);
+  M5.Lcd.printf("angle: %4.2f\n", angle);
 }
 
 void loop() {
   M5.IMU.getAccelData(&accx, &accy, &accz);
-  idx = count % 160;
-  data[idx] = accy;
-  drawGraph(data);
+  drawAngleDiff(accx, accy);
   delay(20);
-  count++;
 }
