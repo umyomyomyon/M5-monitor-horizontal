@@ -1,9 +1,11 @@
 #include <M5StickC.h>
 #include <math.h>
 
-float gx = 0.0F;
-float gy = 0.0F;
-float gz = 0.0F;
+#define SAMPLE_SIZE 160
+float data[SAMPLE_SIZE];
+int count = 0;
+int idx = 0;
+
 float accx = 0.0F;
 float accy = 0.0F;
 float accz = 0.0F;
@@ -20,15 +22,29 @@ void setup() {
   drawBaseLine();
 }
 
-float culcVec(float x, float y, float z) {
-  return sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
+float culcValue(float value, int16_t offset, float div) {
+  return offset - value / div;
+}
+
+void drawGraph(float data[]) {
+  M5.Lcd.fillScreen(BLACK);
+  drawBaseLine();
+  int16_t height = M5.Lcd.height();
+  int16_t offset = height / 2;
+  for (int i = 0; i < SAMPLE_SIZE; i++) {
+    float y = culcValue(data[i], offset, 0.03);
+    if (i != 0 && i != SAMPLE_SIZE - 1) {
+      float _y = culcValue(data[i-1], offset, 0.03);
+      M5.Lcd.drawLine(i - 1, _y, i, y, GREEN);
+    }
+  }
 }
 
 void loop() {
-  M5.IMU.getGyroData(&gx, &gy, &gz);
   M5.IMU.getAccelData(&accx, &accy, &accz);
-  M5.Lcd.setCursor(0, 0);
-  M5.Lcd.printf("gyroX: %4.2f\ngyroY: %4.2f\ngyroZ: %4.2f\n", gx, gy, gz);
-  M5.Lcd.printf("accX: %4.2f\naccY: %4.2f\naccZ: %4.2f\n", accx, accy, accz);
-  M5.Lcd.printf("vecMag: %4.2f", culcVec(accx, accy, accz));
+  idx = count % 160;
+  data[idx] = accy;
+  drawGraph(data);
+  delay(20);
+  count++;
 }
