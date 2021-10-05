@@ -22,15 +22,21 @@ void setup() {
   drawBaseLine();
 }
 
+float culcValue(float value, int16_t offset, float div) {
+  return offset - value / div;
+}
+
 void drawGraph(float data[]) {
   M5.Lcd.fillScreen(BLACK);
   drawBaseLine();
   int16_t height = M5.Lcd.height();
   int16_t offset = height / 2;
   for (int i = 0; i < SAMPLE_SIZE; i++) {
-    float value = data[i];
-    float y = offset - value / 0.03;
-    M5.Lcd.drawPixel(i, y, GREEN);
+    float y = culcValue(data[i], offset, 0.03);
+    if (i != 0 && i != SAMPLE_SIZE - 1) {
+      float _y = culcValue(data[i-1], offset, 0.03);
+      M5.Lcd.drawLine(i - 1, _y, i, y, GREEN);
+    }
   }
 }
 
