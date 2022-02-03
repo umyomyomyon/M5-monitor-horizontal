@@ -1,3 +1,22 @@
+# 概要
+- モニターアームを使用しているときに、ディスプレイが本当に水平になっているのか気になって仕方がなかったためお手軽な水平器を作成した。
+- 加速度の値をそのまま使用するとノイズ入っているのでRCフィルターを実装し、ある程度のノイズは削除した。
+
+# IMAGE
+すごく傾いているとき（赤）
+
+<img width="632" alt="Screen Shot 2022-02-03 at 19 01 59" src="https://user-images.githubusercontent.com/44522011/152321223-5c6a8d7c-a128-4270-8948-4de36a2a96e7.png">
+
+もう少し（緑）
+
+<img width="630" alt="Screen Shot 2022-02-03 at 19 02 13" src="https://user-images.githubusercontent.com/44522011/152321234-50a74c8f-4ca5-4878-95a9-4dfabf48ebfc.png">
+
+傾いていない（青）
+
+<img width="627" alt="Screen Shot 2022-02-03 at 19 02 24" src="https://user-images.githubusercontent.com/44522011/152321248-d0db7f0d-25d6-493c-b3cc-ccda1a1adc1a.png">
+
+
+
 # 参考
 
 ## M5stickCのセンサー周り
